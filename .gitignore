@@ -1,0 +1,41 @@
+# No lockfiles because this is a template/stack
+*lock.json
+
+# Project specific ignores
+.cache
+dist
+reports
+node_modules
+
+# CDK
+.cdk.staging
+cdk.out
+cdk.context.json
+deployment.result.json
+deploymentSummary.md
+.npmignore
+
+# Storybook
+storybook-static
+
+# Remix
+server/index.js
+server/index.js.map
+server/index.mjs
+public/build
+
+# ARC
+sam.json
+sam.yaml
+.env
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# No IDE specific files should ever make it into the repo
+.idea
+.vscode
+
+.eslintrc.js
