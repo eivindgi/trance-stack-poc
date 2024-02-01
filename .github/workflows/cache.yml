@@ -4,8 +4,8 @@ permissions: write-all
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 * * * *' # Runs once an hour
+  # schedule:
+  #   - cron: '0 * * * *' # Runs once an hour
 jobs:
   clear:
     name: Clear cache
