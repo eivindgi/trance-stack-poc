@@ -27,7 +27,7 @@ new EphemeralStack(app, `${name}-ephemeral`, {
   analyticsReporting: true,
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: 'us-east-1' // must be us-east-1 to allow Lambda@Edge
+    region: 'eu-north-1' // must be us-east-1 to allow Lambda@Edge
   }
 });
 
