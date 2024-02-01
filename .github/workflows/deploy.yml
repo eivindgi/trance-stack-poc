@@ -30,7 +30,7 @@ jobs:
         uses: meza/action-setup-node-npm@main
         with:
           command: "install --no-audit --no-fund"
-          node-version: latest
+          node-version: v20.11.0
           cache-name: ${{ needs.verify.outputs.cache-name }}
       - name: 🔂 CDK Cache
         uses: pat-s/always-upload-cache@v3.0.11
