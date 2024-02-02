@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/lint-and-test.yml
     with:
       command: "install --no-audit --no-fund"
-      node-version: "latest"
+      node-version: "v20.11.0"
       junit-report-path: "reports/junit.xml"
       cobertura-report-path: "reports/**/cobertura-coverage.xml"
     secrets:

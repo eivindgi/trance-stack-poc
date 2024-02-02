@@ -16,6 +16,8 @@ concurrency:
 
 jobs:
   deploy-storybook:
+    if: |
+      startsWith(github.event.head_commit.message, 'feat') || startsWith(github.event.head_commit.message, 'fix')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
