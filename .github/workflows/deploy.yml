@@ -27,7 +27,7 @@ jobs:
       - name: ⏬ Checkout
         uses: actions/checkout@v3
       - name: 🔧 Set up node
-        uses: ./.github/workflows/setup-node.yml
+        uses: ./.github/workflows/setup-node
         with:
           command: "install --no-audit --no-fund"
           node-version: v20.11.0
