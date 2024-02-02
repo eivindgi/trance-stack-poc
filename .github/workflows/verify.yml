@@ -15,7 +15,7 @@ jobs:
       group: one-at-a-time
       cancel-in-progress: true
     name: 🧪 Verify PR
-    uses: ./.github/workflow-templates/lint-and-test.yml@main
+    uses: ./.github/workflows/lint-and-test.yml@main
     with:
       command: "install --no-audit --no-fund"
       node-version: "latest"
