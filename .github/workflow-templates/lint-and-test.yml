@@ -1,0 +1,116 @@
+name: Lint and Test
+
+on:
+  workflow_call:
+    inputs:
+      command:
+        description: "Which command to run when installing the dependencies? It will be appended to `npm ` Default: ci"
+        default: install --no-audit --no-fund
+        required: false
+        type: string
+      test:
+        description: 'Run tests'
+        required: false
+        default: true
+        type: boolean
+      node-version:
+        description: "The version of node to use"
+        required: false
+        type: string
+        default: "latest"
+      junit-report-path:
+        description: "The path to the JUnit report"
+        required: false
+        type: string
+        default: "reports/junit.xml"
+      cobertura-report-path:
+        description: "The path to the Cobertura report"
+        required: false
+        type: string
+        default: "reports/coverage/cobertura-coverage.xml"
+      cpdPath:
+        description: "Where is your markdown cpd report generated to?"
+        required: false
+        type: string
+        default: "reports/jscpd/jscpd-report.md"
+      cache-name:
+        description: "The name to assign to the cache"
+        required: false
+        type: string
+        default: pure-dependencies
+    secrets:
+      GH_TOKEN:
+        required: true
+      NPM_TOKEN:
+        required: false
+    outputs:
+      new-release-published:
+        description: "If a new release was published"
+        value: ${{ jobs.verify.outputs.new-release-published }}
+      new-release-version:
+        description: "The version of the new release"
+        value: ${{ jobs.verify.outputs.new-release-version }}
+      cache-name:
+        description: "The cache name used"
+        value: ${{ inputs.cache-name }}
+
+jobs:
+  verify:
+    name: 🔎 Lint and Test
+    runs-on: ubuntu-latest
+    outputs:
+      new-release-published: ${{ steps.get-next-version.outputs.new-release-published }}
+      new-release-version: ${{ steps.get-next-version.outputs.new-release-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up node
+        uses: meza/action-setup-node-npm@main
+        with:
+          command: ${{ inputs.command }}
+          node-version: ${{ inputs.node-version }}
+          cache-name: ${{ inputs.cache-name }}
+      - run: npm run ci
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: inputs.test
+        with:
+          junit_files: ${{ inputs.junit-report-path }}
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        if: inputs.test
+        with:
+          format: markdown
+          output: file
+          hide_complexity: false
+          badge: true
+          filename: ${{ inputs.cobertura-report-path }}
+      - name: Publish code coverage report
+        if: inputs.test
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: (github.event_name == 'pull_request') && (inputs.test)
+        with:
+          recreate: true
+          path: code-coverage-results.md
+      - name: "Check cpd existence"
+        id: cpd_exists
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "${{ inputs.cpdPath }}"
+      - name: Publish jscpd report
+        if: (inputs.test) && (steps.cpd_exists.outputs.files_exists == 'true')
+        run: cat ${{ inputs.cpdPath }} >> $GITHUB_STEP_SUMMARY
+      - name: Add CPD Report PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: (github.event_name == 'pull_request') && (inputs.test) && (steps.cpd_exists.outputs.files_exists == 'true')
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          recreate: true
+          path: ${{ inputs.cpdPath }}
+      - run: npx semantic-release --dry-run
+        id: get-next-version
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - run: echo "Need release? ${{ steps.get-next-version.outputs.new-release-published }}" >> $GITHUB_STEP_SUMMARY

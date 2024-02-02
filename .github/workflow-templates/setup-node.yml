@@ -1,0 +1,45 @@
+name: "Setup node and install dependencies"
+description: "Takes care of the copy-pasta for the cache handling of npm"
+inputs:
+  command:
+    description: "Which command to run when installing the dependencies? It will be appended to `npm ` Default: install --no-audit --no-fund"
+    default: install --no-audit --no-fund
+    required: false
+    type: string
+  cache-name:
+    description: "The name of the cache to use"
+    required: true
+  node-version:
+    description: "The version of node to use"
+    required: false
+    default: "latest"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Use Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v3.5.1
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Cache build helpers
+      id: cache-build-data
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-build-data
+      with:
+        path: ./.cache
+        key: ${{ runner.os }}-build-data-${{ inputs.cache-name }}
+
+    - uses: actions/cache@v3
+      name: Setup node_modules cache
+      id: modules
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-node_modules-${{ inputs.cache-name }}-${{ hashFiles('**/package*.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node_modules-
+
+    - name: Installing Dependencies using npm ${{ inputs.command }}
+      run: npm ${{ inputs.command }}
+      shell: bash
