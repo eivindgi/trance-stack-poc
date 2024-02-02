@@ -15,7 +15,7 @@ jobs:
       group: one-at-a-time
       cancel-in-progress: true
     name: 🧪 Verify PR
-    uses: ./.github/workflow-templates/lint-and-test.yml
+    uses: eivindgi/trance-stack-poc/.github/workflow-templates/lint-and-test.yml@main
     with:
       command: "install --no-audit --no-fund"
       node-version: "latest"
@@ -114,7 +114,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up node
         if: ${{ needs.deploy.outputs.APP_DOMAIN }}
-        uses: ./.github/workflow-templates/setup-node.yml
+        uses: eivindgi/trance-stack-poc/.github/workflow-templates/setup-node.yml@main
         with:
           command: "install --no-audit --no-fund"
           node-version: latest
