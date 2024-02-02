@@ -10,7 +10,7 @@ env:
 
 jobs:
   verify:
-    uses: ./.github/workflows-templates/lint-and-test.yml
+    uses: ./.github/workflow-templates/lint-and-test.yml
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
     with:
@@ -27,7 +27,7 @@ jobs:
       - name: ⏬ Checkout
         uses: actions/checkout@v3
       - name: 🔧 Set up node
-        uses: ./.github/workflows-templates/setup-node.yml
+        uses: ./.github/workflow-templates/setup-node.yml
         with:
           command: "install --no-audit --no-fund"
           node-version: v20.11.0
